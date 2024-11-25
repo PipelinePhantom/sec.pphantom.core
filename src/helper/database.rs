@@ -7,7 +7,6 @@ use uuid::Uuid;
 use std::result::Result;
 use serde_json::json;
 use crate::helper::trace::trace_logs;
-
 use std::sync::{Arc, Mutex};
 use std::{ptr::addr_of, sync::mpsc, thread};
 use tokio::time::{interval, Duration};
@@ -16,7 +15,79 @@ use once_cell::sync::Lazy;
 
 // ------------ ALL STRUCTURE ------------
 
+#[derive(Debug, FromRow, Clone)]
+pub struct USERS {
+    pub user_uuid: String,
+    pub user_username: String,
+    pub user_email: String,
+    pub user_cookie: String,
+}
 
+impl USERS {
+    pub fn default() -> USERS {
+        USERS {
+            user_uuid: "".to_string(),
+            user_username: "".to_string(),
+            user_email: "".to_string(),
+            user_cookie: "".to_string(),
+        }
+    }
+
+    pub async fn get_user_by_cookie(user_cookie:String) -> Vec<USERS> {
+        
+        // check if DB_CLIENT.lock().unwrap().is_none() return any poison error
+        let lock_result = unsafe { DB_CLIENT.lock() };
+    
+        if lock_result.is_err() {
+            // kill script
+            trace_logs("Error: DB_CLIENT.lock().unwrap() is_none() return any poison".to_owned());
+            std::process::exit(1);
+        }
+    
+        // check if need to create new client
+        if lock_result.unwrap().is_none() {
+            new_client().await;
+        }
+    
+        // perform database operations
+        let db_client = unsafe { DB_CLIENT.lock().unwrap() };
+    
+        let db_client = db_client.as_ref();
+
+        let mut risks: Vec<USERS> = Vec::new();
+
+        if let Some(pool) = db_client {
+            let mut conn = pool.get_conn().unwrap();
+            let query = format!("SELECT * FROM users WHERE user_cookie = '{}'", user_cookie);
+
+            let result = conn.query_map(query, |(user_uuid, user_username, user_email, user_cookie): (String, String, String, String)| {
+                USERS {
+                    user_uuid,
+                    user_username,
+                    user_email,
+                    user_cookie,
+                }
+            });
+
+            // check how many rows are returned
+            match result {
+                Ok(fetched_risks) => {
+                    for risk in fetched_risks {
+                        risks.push(risk);
+                    }
+                },
+                Err(_) => {
+                    return risks;
+                }
+            }
+
+            return risks;
+        }
+
+        println!("No database connection");
+        return risks;
+    }
+}
 
 
 // ------------ DATABASE SYSTEM ------------
