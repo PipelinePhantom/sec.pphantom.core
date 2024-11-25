@@ -1,0 +1,27 @@
+[
+    {
+        "name": "users",
+        "columns": [
+            {
+                "name": "user_uuid",
+                "type": "varchar(36) primary key"
+            },
+            {
+                "name": "user_username",
+                "type": "varchar(255) not null default 'alice'"
+            },
+            {
+                "name": "user_email",
+                "type": "text not null"
+            },
+            {
+                "name": "user_password",
+                "type": "text not null"
+            },
+            {
+                "name": "user_cookie",
+                "type": "text not null"
+            }
+        ]
+    }
+]
