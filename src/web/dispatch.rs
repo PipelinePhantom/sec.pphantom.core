@@ -17,16 +17,13 @@ pub async fn dispatch(path: web::Path<String>, req: HttpRequest) -> impl Respond
 
   println!("Request data: {:?}", request_data);
 
-  match request_data.path.as_str() {
-    "" => { content_body = home::home().await; },
-  
-    // default route: 404
-    _ => {      
-      content_body = "__404".to_string();
-    }
+  if request_data.user_logged {
+    content_body = logged(request_data).await;
+  } else {
+    content_body = nonlogged(request_data).await;
   }
 
-    // inject the 404 if the content is __404
+  // inject the 404 if the content is __404
   if content_body.contains("__404") {
     content_body = fs::read_to_string("html/404/index.html").unwrap();
   }
@@ -48,4 +45,33 @@ pub async fn dispatch(path: web::Path<String>, req: HttpRequest) -> impl Respond
 
 
   return HttpResponse::Ok().content_type("text/html").body(content_body)
+}
+
+
+pub async fn nonlogged(request_data:RequestData) -> String {
+  let mut content_body = String::new();
+  match request_data.path.as_str() {
+    "/auth/login" => { content_body = home::home().await; },
+  
+    // default route: 404
+    _ => {      
+      content_body = fs::read_to_string("html/404/redirect.html").unwrap()
+        .replace("{{redirect_link}}", "/auth/login");
+    }
+  }
+  return content_body;
+}
+
+
+pub async fn logged(request_data:RequestData) -> String {
+  let mut content_body = String::new();
+  match request_data.path.as_str() {
+    "/" => { content_body = home::home().await; },
+  
+    // default route: 404
+    _ => {      
+      content_body = "__404".to_string();
+    }
+  }
+  return content_body;
 }
