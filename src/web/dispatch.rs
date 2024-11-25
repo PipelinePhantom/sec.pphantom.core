@@ -74,5 +74,24 @@ pub async fn logged(request_data:RequestData) -> String {
       content_body = "__404".to_string();
     }
   }
+
+
+
+  let tab_to_insert = find_insert(content_body.clone());
+  for(tab, file) in tab_to_insert.iter().zip(tab_to_insert.iter()){
+    // check if file exists
+    if fs::metadata(format!("html/inject/{}.html", file)).is_ok(){
+      let file_content = fs::read_to_string(format!("html/inject/{}.html", file)).unwrap();
+      let inject_name = format!("inject_{}", tab.to_string());
+      let replace_vec = vec![(inject_name, file_content)];
+      content_body = replace_in_body(content_body.clone(), replace_vec);
+    }
+  }
+
+  content_body = content_body.replace("{{user_username}}", &request_data.user_data.user_username);
+  content_body = content_body.replace("{{user_email}}", &request_data.user_data.user_email);
+
+
+
   return content_body;
 }
