@@ -51,7 +51,8 @@ pub async fn dispatch(path: web::Path<String>, req: HttpRequest) -> impl Respond
 pub async fn nonlogged(request_data:RequestData) -> String {
   let mut content_body = String::new();
   match request_data.path.as_str() {
-    "/auth/login" => { content_body = home::home().await; },
+    "/auth/login" => { content_body = auth::login().await; },
+    "/auth/register" => { content_body = auth::register().await; },
   
     // default route: 404
     _ => {      
