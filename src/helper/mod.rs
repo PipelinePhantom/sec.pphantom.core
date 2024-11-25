@@ -4,3 +4,4 @@ pub mod trace;
 pub mod start;
 pub mod database;
 pub mod cookie;
+pub mod functions;

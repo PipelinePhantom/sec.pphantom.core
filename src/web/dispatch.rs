@@ -12,7 +12,7 @@ use crate::web::routes::*;
 #[tracing::instrument(level = "info", name = "Dispatch request", skip(path, req))]
 pub async fn dispatch(path: web::Path<String>, req: HttpRequest) -> impl Responder {
 
-  let request_data = log_request(path, req.clone(), "GET", None).await;
+  let request_data = log_request(path, req.clone(), "GET").await;
   let mut content_body = String::new();
 
   println!("Request data: {:?}", request_data);

@@ -58,7 +58,7 @@ impl USERS {
 
         if let Some(pool) = db_client {
             let mut conn = pool.get_conn().unwrap();
-            let query = format!("SELECT * FROM users WHERE user_cookie = '{}'", user_cookie);
+            let query = format!("SELECT user_uuid, user_username, user_email, user_cookie FROM users WHERE user_cookie = '{}'", user_cookie);
 
             let result = conn.query_map(query, |(user_uuid, user_username, user_email, user_cookie): (String, String, String, String)| {
                 USERS {
@@ -86,6 +86,147 @@ impl USERS {
 
         println!("No database connection");
         return risks;
+    }
+
+    pub async fn create_user(user_email:String, user_hashed_password: String) {
+        // check if DB_CLIENT.lock().unwrap().is_none() return any poison error
+        let lock_result = unsafe { DB_CLIENT.lock() };
+    
+        if lock_result.is_err() {
+            // kill script
+            trace_logs("Error: DB_CLIENT.lock().unwrap() is_none() return any poison".to_owned());
+            std::process::exit(1);
+        }
+    
+        // check if need to create new client
+        if lock_result.unwrap().is_none() {
+            new_client().await;
+        }
+    
+        // perform database operations
+        let db_client = unsafe { DB_CLIENT.lock().unwrap() };
+    
+        let db_client = db_client.as_ref();
+    
+        if let Some(pool) = db_client {
+            let mut conn = pool.get_conn().unwrap();
+    
+            let user_uuid = Uuid::new_v4().to_string();
+            let user_username = user_email.split("@").collect::<Vec<&str>>()[0].to_string();
+            let user_cookie = "".to_string();
+    
+            let query = format!("INSERT INTO users (user_uuid, user_username, user_email, user_password, user_cookie) VALUES ('{}', '{}', '{}', '{}', '{}')", user_uuid, user_username, user_email, user_hashed_password, user_cookie);
+    
+            let result = conn.query_drop(query);
+    
+            match result {
+                Ok(_) => {
+                    return;
+                },
+                Err(_) => {
+                    return;
+                }
+            }
+        }
+    
+        println!("No database connection");
+        return;
+    }
+
+    pub async fn login_user(user_email:String, user_hashed_password: String) -> bool {
+        // check if DB_CLIENT.lock().unwrap().is_none() return any poison error
+        let lock_result = unsafe { DB_CLIENT.lock() };
+    
+        if lock_result.is_err() {
+            // kill script
+            trace_logs("Error: DB_CLIENT.lock().unwrap() is_none() return any poison".to_owned());
+            std::process::exit(1);
+        }
+    
+        // check if need to create new client
+        if lock_result.unwrap().is_none() {
+            new_client().await;
+        }
+    
+        // perform database operations
+        let db_client = unsafe { DB_CLIENT.lock().unwrap() };
+    
+        let db_client = db_client.as_ref();
+    
+        if let Some(pool) = db_client {
+            let mut conn = pool.get_conn().unwrap();
+    
+            let query = format!("SELECT user_uuid, user_username, user_email, user_cookie FROM users WHERE user_email = '{}' AND user_password = '{}'", user_email, user_hashed_password);
+    
+            let result = conn.query_map(query, |(user_uuid, user_username, user_email, user_cookie): (String, String, String, String)| {
+                USERS {
+                    user_uuid,
+                    user_username,
+                    user_email,
+                    user_cookie,
+                }
+            });
+    
+            // check how many rows are returned
+            match result {
+                Ok(fetched_risks) => {
+                    if fetched_risks.len() > 0 {
+                        return true;
+                    }
+                },
+                Err(_) => {
+                    return false;
+                }
+            }
+    
+            return false;
+        }
+    
+        println!("No database connection");
+        return false;
+    }
+
+    pub async fn generate_cookie(user_email:String) -> Uuid {
+        // check if DB_CLIENT.lock().unwrap().is_none() return any poison error
+        let lock_result = unsafe { DB_CLIENT.lock() };
+    
+        if lock_result.is_err() {
+            // kill script
+            trace_logs("Error: DB_CLIENT.lock().unwrap() is_none() return any poison".to_owned());
+            std::process::exit(1);
+        }
+    
+        // check if need to create new client
+        if lock_result.unwrap().is_none() {
+            new_client().await;
+        }
+    
+        // perform database operations
+        let db_client = unsafe { DB_CLIENT.lock().unwrap() };
+    
+        let db_client = db_client.as_ref();
+    
+        if let Some(pool) = db_client {
+            let mut conn = pool.get_conn().unwrap();
+    
+            let user_cookie = Uuid::new_v4();
+    
+            let query = format!("UPDATE users SET user_cookie = '{}' WHERE user_email = '{}'", user_cookie.to_string(), user_email);
+    
+            let result = conn.query_drop(query);
+    
+            match result {
+                Ok(_) => {
+                    return user_cookie;
+                },
+                Err(_) => {
+                    return Uuid::nil();
+                }
+            }
+        }
+    
+        println!("No database connection");
+        return Uuid::nil();
     }
 }
 
@@ -214,9 +355,9 @@ pub async fn check_if_table_exist(table_name:String) -> bool {
     if let Some(pool) = db_client {
         let mut conn = pool.get_conn().unwrap();
 
-        let query = format!("SELECT table_name FROM information_schema.tables WHERE table_name = '{}' AND database = 'phantom' LIMIT 1", table_name);
+        let query = format!("SELECT table_name FROM information_schema.tables WHERE table_name = '{}' AND table_schema = 'phantom' LIMIT 1", table_name);
 
-        let result = conn.query_map(query, |(table_name): (String)| {
+        let result = conn.query_map(query, |table_name: String| {
             table_name
         });
 

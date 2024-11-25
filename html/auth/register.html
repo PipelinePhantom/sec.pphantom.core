@@ -9,12 +9,7 @@
     <!--[ Favicon]-->
     <title>: Phantom : Register page</title>
 
-    <!--[ Favicon]-->
-    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
-
+    
     <!--[ Template main css file ]-->
     <link rel="stylesheet" href="/assets/css/style.min.css">
 
@@ -41,7 +36,7 @@
 
         <!-- start: page body area -->
         <div class="px-xl-5 px-4 auth-body">
-            <form>
+            <form class="row g-3" onsubmit="register(); return false;">
                 <ul class="row g-3 list-unstyled li_animate">
                     <li class="col-12">
                         <h1 class="h2 title-font">Welcome to Phantom</h1>
@@ -51,7 +46,7 @@
                     </li>
                     <li class="col-12">
                         <label class="form-label">Email</label>
-                        <input type="email" class="form-control form-control-lg" placeholder="alice@alice-snow.ru">
+                        <input type="email" class="form-control form-control-lg" id="email" placeholder="alice@alice-snow.ru">
                     </li>
                     <li class="col-12">
                         <div class="form-label">
@@ -59,7 +54,7 @@
                                 Password
                             </span>
                         </div>
-                        <input type="password" class="form-control form-control-lg" placeholder="**********">
+                        <input type="password" class="form-control form-control-lg" placeholder="**********" id="password">
                     </li>
                     <li class="col-12">
                         <div class="form-label">
@@ -67,10 +62,10 @@
                                 Repeat Password
                             </span>
                         </div>
-                        <input type="password" class="form-control form-control-lg" placeholder="**********">
+                        <input type="password" class="form-control form-control-lg" placeholder="**********" id="password2">
                     </li>
                     <li class="col-12 my-lg-4">
-                        <a class="btn btn-lg w-100 btn-primary text-uppercase mb-2" href="#"
+                        <a class="btn btn-lg w-100 btn-primary text-uppercase mb-2" onclick="register();"
                             title="sign in">SIGN UP</a>
                     </li>
                     <li class="col-12">
@@ -90,6 +85,37 @@
 
     </main>
 
+    <script>
+        async function register() {
+            let email = document.getElementById('email').value;
+            let password = document.getElementById('password').value;
+            let password2 = document.getElementById('password2').value;
+
+            if (password != password2) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            const req = await fetch("/api/auth/register", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            })
+
+            const res = await req.json();
+
+            if (res.status == 'success') {
+                window.location.href = '/auth/login';
+            } else {
+                alert(res.message);
+            }
+        }
+    </script>
 </body>
 
 </html>
