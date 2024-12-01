@@ -23,4 +23,7 @@ Cargo.lock
 template
 assets/images
 config
-maker
+
+maker/python/*
+!maker/python/builder.py
+maker/rust/*
