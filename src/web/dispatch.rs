@@ -69,6 +69,8 @@ pub async fn logged(request_data:RequestData) -> String {
   match request_data.path.as_str() {
     "/" => { content_body = home::home().await; },
   
+    "/m/cooking/core" => { content_body = m_cooking::core().await; },
+
     // default route: 404
     _ => {      
       content_body = "__404".to_string();

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<title>: Phantom : Module core</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!--[ Template main css file ]-->
+	<link rel="stylesheet" href="/assets/css/style.min.css">
+
+	{{inject_head}}
+</head>
+
+<body data-bvite="theme-CeruleanBlue" class="layout-border svgstroke-a layout-default">
+
+	<!-- start: main grid layout -->
+	<main class="container-fluid px-0">
+
+		{{inject_logo_block}}
+
+		{{inject_header}}
+
+		{{inject_navbar}}
+
+        {{inject_leftmenu}}
+
+        <!-- start: page header area -->
+        <div class="px-md-4 px-2 py-2 page-header" data-bs-theme="none">
+
+            <div class="d-flex align-items-center">
+                <button class="btn d-none d-xl-inline-flex me-3 px-0 sidebar-toggle" type="button">
+                    <svg class="svg-stroke" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z">
+                        </path>
+                        <path d="M9 4v16"></path>
+                        <path d="M15 10l-2 2l2 2"></path>
+                    </svg>
+                </button>
+                <ol class="breadcrumb mb-0 bg-transparent">
+                    <li class="breadcrumb-item"><a href="/" title="home">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#" title="Malware">Malware</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" title="Available Core">Available Core</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- start: page body area -->
+        <div class="ps-md-4 pe-md-3 px-2 py-3 page-body">
+
+            <ul class="row g-3 li_animate list-unstyled">
+                {{inject_core_list}}
+            </ul>
+
+        </div>
+
+        <!-- start: page footer -->
+        {{inject_footer}}
+    </main>
+
+
+    <!--[ bvite template vender js ]-->
+    <script src="/assets/bundles/libscripts.bundle.js"></script>
+
+    <script src="/assets/js/main.js"></script>
+
+</body>
+
+</html>
