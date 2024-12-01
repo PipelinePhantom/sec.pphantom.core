@@ -42,6 +42,20 @@ pub async fn start() {
     }
 
     trace_logs("Database setup completed !".to_owned());
+
+
+
+    // create all folder
+    fs::create_dir_all(format!("maker/")).unwrap();
+    for l in ["python", "rust"] {
+        // create the folder
+        fs::create_dir_all(format!("maker/{}/", l)).unwrap();
+        fs::create_dir_all(format!("maker/{}/ModulePersistance", l)).unwrap();
+        fs::create_dir_all(format!("maker/{}/ModuleFront", l)).unwrap();
+        fs::create_dir_all(format!("maker/{}/ModuleExploit", l)).unwrap();
+        fs::create_dir_all(format!("maker/{}/ModuleC2C", l)).unwrap();
+        fs::create_dir_all(format!("maker/{}/CompiledMalware", l)).unwrap();
+    }
 }
 
 
