@@ -1,7 +1,7 @@
 // export the home route handler
 use std::fs;
 
-use serde_json::{json, Value};
+use serde_json::Value;
 
 #[tracing::instrument(level = "info")]
 pub async fn core() -> String {

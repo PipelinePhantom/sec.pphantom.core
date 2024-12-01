@@ -68,8 +68,12 @@ pub async fn logged(request_data:RequestData) -> String {
   let mut content_body = String::new();
   match request_data.path.as_str() {
     "/" => { content_body = home::home().await; },
-  
+
     "/m/cooking/core" => { content_body = m_cooking::core().await; },
+    "/m/cooking/mods/c2c" => { content_body = m_mods::m_mods("C2C".to_string(), "maker/python/ModuleC2C/".to_string()).await; },
+    "/m/cooking/mods/exploit" => { content_body = m_mods::m_mods("exploit".to_string(), "maker/python/ModuleExploit/".to_string()).await; },
+    "/m/cooking/mods/persistance" => { content_body = m_mods::m_mods("persistance".to_string(), "maker/python/ModulePersistance/".to_string()).await; },
+    "/m/cooking/mods/front" => { content_body = m_mods::m_front().await; },
 
     // default route: 404
     _ => {      
