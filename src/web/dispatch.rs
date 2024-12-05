@@ -1,9 +1,8 @@
 use actix_web::{get,web,HttpResponse,HttpRequest,Responder};
-use std::fs;
+use std::{fs, path};
 use crate::helper::{find_insert::find_insert,replace_in_body::replace_in_body};
 use crate::helper::trace::{trace_logs,trace_warn};
 use crate::api::init::{RequestData, log_request};
-use crate::helper::database::USERS;
 
 // import the routes pages
 use crate::web::routes::*;
@@ -74,6 +73,10 @@ pub async fn logged(request_data:RequestData) -> String {
     "/m/cooking/mods/exploit" => { content_body = m_mods::m_mods("exploit".to_string(), "maker/python/ModuleExploit/".to_string()).await; },
     "/m/cooking/mods/persistance" => { content_body = m_mods::m_mods("persistance".to_string(), "maker/python/ModulePersistance/".to_string()).await; },
     "/m/cooking/mods/front" => { content_body = m_mods::m_front().await; },
+
+    "/m/cicd" => { content_body = m_cicd::home().await; },
+
+    path if path.starts_with("/m/cicd/build/") => { content_body = m_cicd::build(request_data.clone()).await; },
 
     // default route: 404
     _ => {      
